@@ -12,3 +12,9 @@ print("Data cleaning completed!")
 df_maang = df_maang[(df_maang['Date'] >= '2020-01-01') & (df_maang['Date'] <= '2022-12-31')]
 df_market = df_market[(df_market['Date'] >= '2020-01-01') & (df_market['Date'] <= '2022-12-31')]
 print("Data filtered for 2020-2022!")
+df_combined = pd.merge(df_maang, df_market, on='Date', how='inner')
+print("Datasets merged successfully!")
+correlation_matrix = df_combined.corr()
+print("Stock Trend Summary:")
+print(df_combined.describe())
+print("Correlation matrix computed!")
