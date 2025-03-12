@@ -1,1 +1,0 @@
-capstone_env\Scripts\activate
