@@ -18,3 +18,17 @@ correlation_matrix = df_combined.corr()
 print("Stock Trend Summary:")
 print(df_combined.describe())
 print("Correlation matrix computed!")
+import matplotlib.pyplot as plt
+import seaborn as sns
+plt.figure(figsize=(12,6))
+plt.plot(df_combined['Date'], df_combined['Close'], label='Stock Close Price')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Stock Price Trends (2020-2022)')
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(10,8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+plt.title('Stock vs Market Factor Correlation')
+plt.show()
