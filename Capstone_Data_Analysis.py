@@ -1,11 +1,11 @@
 import pandas as pd
 import os
 
-# Define the full file paths
+# full file paths
 maang_file = r"C:\Users\Felice\Documents\projects\Capstone\Combined MAANG.csv"
 market_file = r"C:\Users\Felice\Documents\projects\Capstone\US Stock Market Data.csv"
 
-# Ensure the files exist before proceeding
+# verify the files exist before proceeding
 if not os.path.exists(maang_file):
     raise FileNotFoundError(f"Error: The file '{maang_file}' was not found.")
 if not os.path.exists(market_file):
@@ -17,10 +17,10 @@ df_market = pd.read_csv(market_file)
 
 print("Project Objective: To analyze how MAANG stocks performed compared to the broader market during 2020-2022 pandemic period")
 
-# Confirm datasets loaded
+# show datasets loaded
 print("Datasets loaded successfully!\n")
 
-# Display initial data preview
+# show initial data preview
 print("Initial view of MAANG data:")
 print(df_maang.head())
 print(df_maang.info())
