@@ -23,11 +23,10 @@ def clean_and_merge_data(df_maang, df_market):
     """
     Clean datasets and merge them with robust date handling
     """
-    # Ensure all critical columns exist
     required_maang_cols = ["Date", "Close"]
     required_market_cols = ["Date", "S&P_500_Price"]
-    
-    # Check for required columns
+
+    # Ensure required columns exist
     for col in required_maang_cols:
         if col not in df_maang.columns:
             raise ValueError(f"Missing required column {col} in MAANG dataset")
@@ -36,51 +35,33 @@ def clean_and_merge_data(df_maang, df_market):
         if col not in df_market.columns:
             raise ValueError(f"Missing required column {col} in Market dataset")
     
-    # Use .ffill() for forward filling
+    # Forward fill missing values
     df_maang = df_maang.ffill()
     df_market = df_market.ffill()
     
-    # Robust date conversion with multiple format handling
-    date_formats = ["%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y"]
-    
-    # Convert Date column for MAANG dataset
-    df_maang["Date"] = pd.to_datetime(df_maang["Date"], 
-                                      format=None,  # Allow automatic format detection 
-                                      infer_datetime_format=True, 
-                                      errors='coerce')
-    
-    # Convert Date column for Market dataset
-    df_market["Date"] = pd.to_datetime(df_market["Date"], 
-                                       format=None,  # Allow automatic format detection
-                                       infer_datetime_format=True, 
-                                       errors='coerce')
-    
-    # Remove any rows with NaT (Not a Time) values in the Date column
+    # Convert Date columns to datetime (Removed deprecated infer_datetime_format)
+    df_maang["Date"] = pd.to_datetime(df_maang["Date"], errors='coerce')
+    df_market["Date"] = pd.to_datetime(df_market["Date"], errors='coerce')
+
+    # Remove rows with NaT (invalid dates)
     df_maang = df_maang.dropna(subset=["Date"])
     df_market = df_market.dropna(subset=["Date"])
-    
-    # Ensure numeric columns
-    numeric_columns_maang = ["Close"]
-    numeric_columns_market = ["S&P_500_Price"]
-    
-    # Convert numeric columns, handling potential string values
-    for col in numeric_columns_maang:
-        df_maang[col] = pd.to_numeric(df_maang[col], errors='coerce')
-    
-    for col in numeric_columns_market:
-        df_market[col] = pd.to_numeric(df_market[col], errors='coerce')
-    
-    # Remove rows with NaN in numeric columns
-    df_maang = df_maang.dropna(subset=numeric_columns_maang)
-    df_market = df_market.dropna(subset=numeric_columns_market)
-    
+
+    # Convert numeric columns
+    df_maang["Close"] = pd.to_numeric(df_maang["Close"], errors='coerce')
+    df_market["S&P_500_Price"] = pd.to_numeric(df_market["S&P_500_Price"], errors='coerce')
+
+    # Drop rows with NaN in numeric columns
+    df_maang = df_maang.dropna(subset=["Close"])
+    df_market = df_market.dropna(subset=["S&P_500_Price"])
+
     # Filter data for 2020-2022
     df_maang = df_maang[(df_maang["Date"] >= "2020-01-01") & (df_maang["Date"] <= "2022-12-31")]
     df_market = df_market[(df_market["Date"] >= "2020-01-01") & (df_market["Date"] <= "2022-12-31")]
-    
-    # Merge datasets
+
+    # Merge datasets on Date
     df_merged = pd.merge(df_maang, df_market, on="Date", how="inner")
-    
+
     # Calculate percentage difference
     df_merged["MAANG_Market_Diff_Pct"] = ((df_merged["Close"] - df_merged["S&P_500_Price"]) / df_merged["S&P_500_Price"]) * 100
     
@@ -141,8 +122,7 @@ def create_pivot_table(df_merged):
     Create and save pivot table
     """
     try:
-        # Monthly average comparison
-        pivot_monthly = df_merged.groupby(pd.Grouper(key="Date", freq="M")).agg({
+        pivot_monthly = df_merged.groupby(pd.Grouper(key="Date", freq="ME")).agg({
             "Close": "mean",
             "S&P_500_Price": "mean",
             "MAANG_Market_Diff_Pct": "mean"
@@ -158,11 +138,9 @@ def main():
     """
     Main function to orchestrate data processing and visualization
     """
-    # Load data
     df_maang, df_market = load_data()
     
     if df_maang is not None and df_market is not None:
-        # Clean and merge data
         try:
             df_merged = clean_and_merge_data(df_maang, df_market)
             
@@ -180,7 +158,6 @@ def main():
         
         except Exception as e:
             print(f"An error occurred during data processing: {e}")
-            print("Please check your data files and ensure they are correctly formatted.")
 
 if __name__ == "__main__":
     main()
