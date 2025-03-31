@@ -1,0 +1,12 @@
+ Data Dictionary
+
+ Combined_MAANG.csv
+- **Date**: The trading date (YYYY-MM-DD)
+- **Close**: Closing stock price for MAANG
+
+ US_Stock_Market_Data.csv
+- **Date**: The trading date (YYYY-MM-DD)
+- **S&P_500_Price**: Closing price of S&P 500 Index
+
+ Processed_MAANG_vs_Market.csv
+- **MAANG_Market_Diff_Pct**: Percentage difference between MAANG and S&P 500
